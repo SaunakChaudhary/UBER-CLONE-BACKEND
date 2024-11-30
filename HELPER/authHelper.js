@@ -48,5 +48,5 @@ module.exports = {
   hashingPassword,
   comparingPassword,
   token,
-  jwt_verification,
+  jwt_verification
 };
