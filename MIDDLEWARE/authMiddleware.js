@@ -1,4 +1,5 @@
 const userModel = require("../MODELS/user.model");
+const captainModel = require("../MODELS/captain.model");
 const jwt = require("jsonwebtoken");
 const blackListTokenModel = require("../MODELS/blacklistModel");
 
@@ -23,4 +24,26 @@ const authUser = async (req, res, next) => {
   }
 };
 
-module.exports = { authUser };
+const authCaptain = async (req, res, next) => {
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  const isBlacklisted = await blackListTokenModel.findOne({ token: token });
+
+  if (isBlacklisted) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const decode = await jwt.verify(token, process.env.KEY);
+    const captain = await captainModel.findById(decode.id);
+    req.captain = captain;
+    return next();
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+
+};
+
+module.exports = { authUser , authCaptain };

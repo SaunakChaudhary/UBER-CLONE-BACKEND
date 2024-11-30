@@ -6,8 +6,9 @@ const DB = require("./DB/db");
 const cookieParser = require("cookie-parser");
 
 // Importing Routers
-
 const userRouter = require("./ROUTER/user.routes");
+const captainRouter = require("./ROUTER/captain.routes");
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -20,7 +21,8 @@ app.use(cors(corseOption));
 // Routers
 
 app.use("/users", userRouter);
-
+app.use("/captains", captainRouter);
+ 
 DB()
   .then(() => {
     app.listen(process.env.PORT, () => {
