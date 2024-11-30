@@ -27,20 +27,11 @@ const token = async (email, id) => {
         email: email,
         id: id,
       },
-      process.env.KEY
+      process.env.KEY,
+      { expiresIn: "24h" }
     );
   } catch (error) {
     console.log("Error From JWT: " + error);
-  }
-};
-
-const jwt_verification = async (serverToken) => {
-  try {
-    const data = await jwt.verify(serverToken, process.env.KEY);
-    return data;
-  } catch (error) {
-    console.error("JWT VERIFICATION ERROR IN HELPER: " + error);
-    return null; // Return null to indicate token generation failed
   }
 };
 
@@ -48,5 +39,4 @@ module.exports = {
   hashingPassword,
   comparingPassword,
   token,
-  jwt_verification
 };

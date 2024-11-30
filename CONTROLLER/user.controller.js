@@ -1,6 +1,7 @@
 const authHelper = require("../HELPER/authHelper");
 const { validationResult } = require("express-validator");
 const userModel = require("../MODELS/user.model");
+const blackListTokenModel = require("../MODELS/blacklistModel");
 
 const register = async (req, res) => {
   try {
@@ -78,6 +79,9 @@ const login = async (req, res) => {
     // Genrerate the Token
     const token = await authHelper.token(email, user._id.toString());
 
+    //Set Cookies
+    res.cookie("token", token);
+
     // Give the Response
     res.status(201).json({ token, user });
   } catch (error) {
@@ -85,4 +89,24 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register , login};
+const getUserProfile = async (req, res) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    const token = req.cookies.token || req.headers.authorization.split(" ")[1];
+    res.clearCookie("token");
+
+    await blackListTokenModel.create({ token });
+
+    res.status(200).json({ message: "Logged out" });
+  } catch (error) {
+    return res.status(401).json({ message: error.message });
+  }
+};
+module.exports = { register, login, getUserProfile, logout };
